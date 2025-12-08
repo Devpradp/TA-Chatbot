@@ -15,8 +15,7 @@ def build_json(
     source_file: str,
     source_type: str,
     slides: List[Dict[str, Any]],
-) 
-
+) -> Dict[str, Any]:
     return {
         "course_id": course_id,         # ex: CSE368
         "lecture_title": lecture_title,
@@ -32,21 +31,19 @@ def build_slide_obj(
     text_blocks: List[str],
     notes: str = "",
     images: Optional[List[str]] = None,
-)
-
+) -> Dict[str, Any]:
     if images is None:
         images = []
+    return {
+        "index": index,             # slide/page number starting at 1
+        "title": title,             # title or heading
+        "text_blocks": text_blocks, # text chunks
+        "notes": notes,             # speaker notes
+        "images": images,           # images (for future if we have time)
+    }
 
-        return {
-            "index": index,             # slide/page number starting at 1
-            "title": title,             # title or heading
-            "text_blocks": text_blocks, # text chunks
-            "notes": notes,             # speaker notes
-            "images": images,           # images (for future if we have time)
-        }
+def extract_pptx(pptx_path: Path) -> List[Dict[str, Any]]:
 
-def extract_pptx(pptx_path: Path):
-    
     ppt = Presentation(pptx_path)
     slides: List[Dict[str, Any]] = []
 
@@ -63,7 +60,7 @@ def extract_pptx(pptx_path: Path):
             if not text:
                 continue
             
-            if title = "":
+            if title == "":
                 title = text
             else:
                text_blocks.append(text)
@@ -79,18 +76,19 @@ def extract_pptx(pptx_path: Path):
             text_blocks = text_blocks,
             notes = notes,
             images = [],            # if we have time to impliment
-            )
-            slides.append(slide_obj)
+        )
+        slides.append(slide_obj)
             
     return slides
 
-def extract_pdf(pdf_path: Path):
+def extract_pdf(pdf_path: Path) -> List[Dict[str, Any]]:
     
     pdfdoc = fitz.open(pdf_path)
     slides: List[Dict[str, Any]] = []
 
     for i, page in enumerate(pdfdoc, start = 1):
         blocks = page.get_text("blocks")
+        
         page_blocks: List[str] = []
 
         for block in blocks:
