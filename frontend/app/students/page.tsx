@@ -51,16 +51,27 @@ export default function StudentsPage() {
 
     try {
       // Placeholder API call with 2 second delay
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      // await new Promise((resolve) => setTimeout(resolve, 2000));
       
       // Placeholder response - replace with actual API call
+
+      const response = await fetch("http://localhost:8000/ask", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ question: userMessage }),
+      });
+
+      const data = await response.json();
 
       // Placeholder bot response
       const botMsg: Message = {
         id: (Date.now() + 1).toString(),
-        text: `This is a placeholder response. Replace this with your actual API response.`,
+        text: data.answer,
         role: "bot",
       };
+    
       setMessages((prev) => [...prev, botMsg]);
     } catch (error) {
       console.error("Error sending message:", error);
