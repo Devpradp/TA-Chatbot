@@ -12,9 +12,11 @@ export default function Home() {
             Students
           </Button>
         </Link>
-        <Button size="lg" variant="outline" className="w-48 border-2" disabled>
-          Professors
-        </Button>
+        <Link href="/professors">
+          <Button size="lg" variant="outline" className="w-48 border-2">
+            Professors
+          </Button>
+        </Link>
       </div>
     </div>
   );
