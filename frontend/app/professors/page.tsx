@@ -3,6 +3,7 @@
 import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Upload, Loader2 } from "lucide-react";
+import { text } from "stream/consumers";
 
 export default function ProfessorsPage() {
   const [files, setFiles] = useState<File[]>([]);
@@ -31,7 +32,30 @@ export default function ProfessorsPage() {
 
     try {
       // Placeholder API call with 5 second delay
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      // await new Promise((resolve) => setTimeout(resolve, 2000));
+
+      const formData = new FormData();
+      files.forEach((file)=> {
+        formData.append("file", file);
+      });
+
+      const textContents = [];
+
+      for (const file of files){
+        const fileText = await file.text();
+        textContents.push(fileText);
+      }
+
+      const combinedText = textContents.join("\n\n");
+      const response = await fetch("http://localhost:8000/upload_slides", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({text: combinedText}),
+      });
+
+      const data = await response.json()
 
       // Placeholder - replace with actual API call
       // const formData = new FormData();
