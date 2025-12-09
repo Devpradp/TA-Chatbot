@@ -1,8 +1,14 @@
-from fastapi import FastAPI, UploadFile, File
+from fastapi import FastAPI
 import faiss
 from openai import OpenAI
 import numpy as np
 from pydantic import BaseModel
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+
+api_key = os.getenv("OPENAI_API_KEY")
 
 
 #OpenAI setup
@@ -16,6 +22,16 @@ stored_chunks = []
 
 # Creating Endpoints
 app = FastAPI()
+from fastapi.middleware.cors import CORSMiddleware
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"], 
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 
 slides_db = {}
 
