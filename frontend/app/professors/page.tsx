@@ -3,7 +3,6 @@
 import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Upload, Loader2 } from "lucide-react";
-import { text } from "stream/consumers";
 
 export default function ProfessorsPage() {
   const [files, setFiles] = useState<File[]>([]);
@@ -22,31 +21,32 @@ export default function ProfessorsPage() {
     }
   };
 
-  const handleUploadClick = () => {
-    fileInputRef.current?.click();
+  const handleUploadClick = () => { 
+    fileInputRef.current?.click(); // Click the file input to open the file selector
   };
 
   const handleSend = async () => {
-    setIsLoading(true);
+    setIsLoading(true); // Set the loading state to true until the files are sent successfully
     setSuccessMessage(null);
 
-    try {
-      // Placeholder API call with 5 second delay
-      // await new Promise((resolve) => setTimeout(resolve, 2000));
-
+    try { 
+      // Convert the files to a form data object (converts HTML form data to a JSON object)
       const formData = new FormData();
       files.forEach((file)=> {
         formData.append("file", file);
       });
 
-      const textContents = [];
+      const textContents = []; // Array to store the text contents of the files
 
+      // Read the text contents of the files
       for (const file of files){
         const fileText = await file.text();
         textContents.push(fileText);
       }
 
-      const combinedText = textContents.join("\n\n");
+      const combinedText = textContents.join("\n\n"); // Combine the text contents of the files into a single string
+
+      // Send the text contents to the "upload_slides" endpoint in backend
       const response = await fetch("http://localhost:8000/upload_slides", {
         method: "POST",
         headers: {
@@ -55,27 +55,16 @@ export default function ProfessorsPage() {
         body: JSON.stringify({text: combinedText}),
       });
 
-      const data = await response.json()
-
-      // Placeholder - replace with actual API call
-      // const formData = new FormData();
-      // files.forEach((file) => {
-      //   formData.append("files", file);
-      // });
-      // const response = await fetch("/api/upload", {
-      //   method: "POST",
-      //   body: formData,
-      // });
-      // const data = await response.json();
+      const data = await response.json() // Parse the response from the backend as JSON
 
       // Clear files after successful send
       setFiles([]);
       setSuccessMessage("Files sent successfully!");
-    } catch (error) {
+    } catch (error) { // Error handling if the files are not sent successfully
       console.error("Error sending files:", error);
       setSuccessMessage("Error sending files. Please try again.");
     } finally {
-      setIsLoading(false);
+      setIsLoading(false); // Reset the loading state
     }
   };
 
@@ -111,7 +100,7 @@ export default function ProfessorsPage() {
           disabled={isLoading}
           className="w-48"
         >
-          {isLoading ? (
+          {isLoading ? ( // If the loading state is true, show the loading spinner and the text "Sending..."
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               Sending...
@@ -122,12 +111,12 @@ export default function ProfessorsPage() {
         </Button>
 
         {/* Success Message */}
-        {successMessage && (
+        {successMessage && ( // If the success message is not null, show the success message
           <div
             className={`text-sm mt-2 ${
-              successMessage.includes("Error")
-                ? "text-red-600"
-                : "text-green-600"
+              successMessage.includes("Error") 
+                ? "text-red-600" // If the success message contains the word "Error", show the text in red
+                : "text-green-600" // If the success message does not contain the word "Error", show the text in green
             }`}
           >
             {successMessage}
@@ -135,7 +124,7 @@ export default function ProfessorsPage() {
         )}
 
         {/* Hidden File Input */}
-        <input
+        <input // Hidden file input to select the files to upload
           ref={fileInputRef}
           type="file"
           onChange={handleFileSelect}

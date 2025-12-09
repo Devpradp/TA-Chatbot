@@ -3,6 +3,10 @@
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
+/*
+  This is the home page of the app. 
+  It displays the two buttons for the students and professors.
+*/
 export default function Home() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background">
@@ -17,7 +21,7 @@ export default function Home() {
             Professors
           </Button>
         </Link>
-      </div>
+        </div>
     </div>
   );
 }
