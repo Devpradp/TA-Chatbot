@@ -1,0 +1,11 @@
+# Python virtual environments (do not commit)
+venv/
+.venv/
+
+# Bytecode/cache
+__pycache__/
+*.py[cod]
+
+# OS/IDE noise
+.DS_Store
+.idea/
