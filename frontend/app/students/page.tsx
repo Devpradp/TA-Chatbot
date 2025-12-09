@@ -5,10 +5,11 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Loader2 } from "lucide-react";
 
+// Interface for the messages in the chatbot
 interface Message {
   id: string;
   text: string;
-  role: "user" | "bot";
+  role: "user" | "bot"; // "user" for the user's messages, "bot" for the chatbot's messages
 }
 
 export default function StudentsPage() {
@@ -36,26 +37,22 @@ export default function StudentsPage() {
   }, [messages, isLoading]);
 
   const handleSend = async () => {
-    const userMessage = message.trim();
-    if (!userMessage || isLoading) return;
+    const userMessage = message.trim(); // Trim the user message to remove any whitespace
+    if (!userMessage || isLoading) return; // If the user message is empty or the loading state is true, return
 
-    // Add user message immediately
+    // Add user message immediately to the messages array
     const userMsg: Message = {
       id: Date.now().toString(),
       text: userMessage,
       role: "user",
     };
-    setMessages((prev) => [...prev, userMsg]);
-    setMessage("");
-    setIsLoading(true);
+    setMessages((prev) => [...prev, userMsg]); // Add the user message to the messages array
+    setMessage(""); // Clear the user message input
+    setIsLoading(true); // Set the loading state to true until the response is received
 
     try {
-      // Placeholder API call with 2 second delay
-      // await new Promise((resolve) => setTimeout(resolve, 2000));
-      
-      // Placeholder response - replace with actual API call
-
-      const response = await fetch("http://localhost:8000/ask", {
+      // Send the user message to the "ask" endpoint in backend
+      const response = await fetch("http://localhost:8000/ask", { 
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -63,17 +60,17 @@ export default function StudentsPage() {
         body: JSON.stringify({ question: userMessage }),
       });
 
-      const data = await response.json();
+      const data = await response.json(); // Parse the response from the backend as JSON
 
-      // Placeholder bot response
+      // Add the bot message to the messages array
       const botMsg: Message = {
         id: (Date.now() + 1).toString(),
         text: data.answer,
         role: "bot",
       };
     
-      setMessages((prev) => [...prev, botMsg]);
-    } catch (error) {
+      setMessages((prev) => [...prev, botMsg]); // Add the bot message to the messages array
+    } catch (error) { // Error handling if the message is not sent successfully
       console.error("Error sending message:", error);
       const errorMsg: Message = {
         id: (Date.now() + 1).toString(),
@@ -82,7 +79,7 @@ export default function StudentsPage() {
       };
       setMessages((prev) => [...prev, errorMsg]);
     } finally {
-      setIsLoading(false);
+      setIsLoading(false); // Reset the loading state
     }
   };
 
@@ -95,7 +92,7 @@ export default function StudentsPage() {
             ref={chatAreaRef}
             className="flex-1 bg-gray-200 rounded-lg overflow-y-auto max-h-[calc(100vh-150px)] min-h-[500px] p-6 flex flex-col gap-4"
           >
-            {messages.length === 0 && (
+            {messages.length === 0 && ( // If the messages array is empty, show the text "Ask anything about class"
               <div className="flex-1 flex items-center justify-center text-gray-500 text-sm"></div>
             )}
             {messages.map((msg) => (
@@ -116,7 +113,7 @@ export default function StudentsPage() {
                 </div>
               </div>
             ))}
-            {isLoading && (
+            {isLoading && ( // If the loading state is true, show the loading spinner and the text "Thinking..."
               <div className="flex justify-start">
                 <div className="bg-white text-foreground border border-gray-300 rounded-lg px-4 py-2 flex items-center gap-2">
                   <Loader2 className="h-4 w-4 animate-spin text-gray-500" />

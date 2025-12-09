@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Link from "next/link";
 
+// Fonts
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -25,9 +26,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      {/* Initialize the fonts */}
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        {/* Header of the app */}
         <header className="border-b border-gray-200 bg-background">
           <div className="container mx-auto px-4 py-4">
             <Link href="/" className="text-2xl font-semibold hover:opacity-80 transition-opacity">
