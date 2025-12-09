@@ -4,11 +4,15 @@ import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Upload, Loader2 } from "lucide-react";
 
+/*
+  This is the professor's page
+  This will be used for the professor to upload their notes/slides for the chatbot to use
+ */
 export default function ProfessorsPage() {
-  const [files, setFiles] = useState<File[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [files, setFiles] = useState<File[]>([]); // State that stores the files to upload
+  const [isLoading, setIsLoading] = useState(false); // State that stores the loading state
+  const [successMessage, setSuccessMessage] = useState<string | null>(null); // State that stores the success message
+  const fileInputRef = useRef<HTMLInputElement>(null); // Reference to the file input element
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = event.target.files?.[0];

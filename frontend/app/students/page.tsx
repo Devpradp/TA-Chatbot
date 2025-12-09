@@ -7,17 +7,21 @@ import { ArrowRight, Loader2 } from "lucide-react";
 
 // Interface for the messages in the chatbot
 interface Message {
-  id: string;
-  text: string;
+  id: string; // The id of the message
+  text: string; // The text of the message
   role: "user" | "bot"; // "user" for the user's messages, "bot" for the chatbot's messages
 }
 
+/*
+  This is the student's page
+  This will be used for the student to chat with the chatbot
+ */
 export default function StudentsPage() {
-  const [message, setMessage] = useState("");
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const chatAreaRef = useRef<HTMLDivElement>(null);
+  const [message, setMessage] = useState(""); // State that stores the message to send
+  const [messages, setMessages] = useState<Message[]>([]); // State that stores the messages
+  const [isLoading, setIsLoading] = useState(false); // State that stores the loading state
+  const textareaRef = useRef<HTMLTextAreaElement>(null); // Reference to the textarea element
+  const chatAreaRef = useRef<HTMLDivElement>(null); // Reference to the chat area element
 
   // Auto-resize textarea
   useEffect(() => {
