@@ -32,30 +32,23 @@ export default function ProfessorsPage() {
     try { 
       // Convert the files to a form data object (converts HTML form data to a JSON object)
       const formData = new FormData();
-      files.forEach((file)=> {
-        formData.append("file", file);
-      });
 
-      const textContents = []; // Array to store the text contents of the files
-
-      // Read the text contents of the files
-      for (const file of files){
-        const fileText = await file.text();
-        textContents.push(fileText);
-      }
-
-      const combinedText = textContents.join("\n\n"); // Combine the text contents of the files into a single string
+      formData.append("file", files[0]);
+      formData.append("course_id", "CSE368");
+      formData.append("lecture_title", files[0].name);
 
       // Send the text contents to the "upload_slides" endpoint in backend
       const response = await fetch("http://localhost:8000/upload_slides", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({text: combinedText}),
+        body: formData,
       });
+      
+      if (!response.ok) {
+        throw new Error("Upload filed: ${response.status}")
+      }
 
       const data = await response.json() // Parse the response from the backend as JSON
+      console.log("Upload response:", data);
 
       // Clear files after successful send
       setFiles([]);

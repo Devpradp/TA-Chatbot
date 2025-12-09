@@ -1,10 +1,12 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, UploadFile, File, HTTPException
 import faiss
 from openai import OpenAI
 import numpy as np
 from pydantic import BaseModel
 from dotenv import load_dotenv
 import os
+from pathlib import Path
+from .extract import extract_pdf, extract_pptx, build_json
 
 load_dotenv()
 
@@ -51,10 +53,42 @@ def chunk_text(text, chunk_size=500):
     return chunks
 
 @app.post("/upload_slides")
-async def upload_slides(input: SlideInput):
+async def upload_slides(file: UploadFile = File(...), course_id: str = "", lecture_title: str = ""):
     global index, stored_chunks
 
-    chunks = chunk_text(input.text)
+    ext = Path(file.filename).suffix.lower()
+
+    if ext not in {".pptx", ".pdf"}:
+        raise HTTPException(status_code=400, detail = "Only support .pptx or .pdf")
+    
+    temp = Path("/tmp") / file.filename
+    temp.write_bytes(await file.read())
+
+    if ext == ".pptx":
+        slides = extract_pptx(temp)
+        source_type = "pptx"
+    else:
+        slides = extract_pdf(temp)
+        source_type = "pdf"
+
+    
+    doc_json = build_json(
+        course_id = course_id or "unknown",
+        lecture_title = lecture_title or temp.stem,
+        source_file = str(temp),
+        source_type = source_type,
+        slides = slides,
+    )
+
+
+    chunks = []
+
+    for slide in slides:
+        chunk.append(slide["title"])
+        chunk.extend(slide["text_blocks"])
+        if slide.get("notes"):
+            chunk.append(slide["notes"])
+
     embeddings = []
     for chunk in chunks:
         stored_chunks.append(chunk)
@@ -66,7 +100,7 @@ async def upload_slides(input: SlideInput):
     embeddings_np = np.array(embeddings).astype("float32")
 
     index.add(embeddings_np)
-    return {"status": "Slides uploaded and processed!", "chunks": len(chunks)}
+    return {"status": "Slides uploaded and processed!", "chunks": len(embeddings), "slides": len(slides)}
 
 
 class QuestionInput(BaseModel):
