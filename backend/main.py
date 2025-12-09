@@ -84,10 +84,10 @@ async def upload_slides(file: UploadFile = File(...), course_id: str = "", lectu
     chunks = []
 
     for slide in slides:
-        chunk.append(slide["title"])
-        chunk.extend(slide["text_blocks"])
+        chunks.append(slide["title"])
+        chunks.extend(slide["text_blocks"])
         if slide.get("notes"):
-            chunk.append(slide["notes"])
+            chunks.append(slide["notes"])
 
     embeddings = []
     for chunk in chunks:
