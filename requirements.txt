@@ -3,3 +3,7 @@ uvicorn
 faiss-cpu
 openai
 pydantic
+python-dotenv
+python-multipart
+python-pptx
+PyMuPDF
