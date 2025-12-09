@@ -18,12 +18,12 @@ def build_json(
 ) -> Dict[str, Any]:
     return {
         "course_id": course_id,         # ex: CSE368
-        "lecture_title": lecture_title,
+        "lecture_title": lecture_title, # lecture name
         "source_file": source_file,     # the file
         "source_type": source_type,     # "pptx" or "pdf"
         "slides": slides                # list of slide/page dicts
     }
-
+# Build a single slide object
 def build_slide_obj(
     *,
     index: int,
@@ -35,13 +35,14 @@ def build_slide_obj(
     if images is None:
         images = []
     return {
-        "index": index,             # slide/page number starting at 1
-        "title": title,             # title or heading
-        "text_blocks": text_blocks, # text chunks
-        "notes": notes,             # speaker notes
-        "images": images,           # images (for future if we have time)
+        "index": index,                 # slide/page number starting at 1
+        "title": title,                 # title or heading
+        "text_blocks": text_blocks,     # text chunks
+        "notes": notes,                 # speaker notes
+        "images": images,               # images (for future if we have time)
     }
 
+# Extract text (and speaker notes) from a pptx
 def extract_pptx(pptx_path: Path) -> List[Dict[str, Any]]:
 
     ppt = Presentation(pptx_path)
@@ -51,6 +52,7 @@ def extract_pptx(pptx_path: Path) -> List[Dict[str, Any]]:
         title = ""
         text_blocks: List[str] = []
 
+        # first non-empty text becomes title, and the test becomes textblocks
         for shape in slide.shapes:
             if not hasattr(shape, "text"):
                 continue
@@ -65,6 +67,7 @@ def extract_pptx(pptx_path: Path) -> List[Dict[str, Any]]:
             else:
                 text_blocks.append(text)
 
+        # extract speaker notes if there are any
         notes = ""
         if slide.has_notes_slide and slide.notes_slide.notes_text_frame is not None:
             notes_raw = slide.notes_slide.notes_text_frame.text or ""
@@ -81,6 +84,7 @@ def extract_pptx(pptx_path: Path) -> List[Dict[str, Any]]:
             
     return slides
 
+# Extract text from a pdf
 def extract_pdf(pdf_path: Path) -> List[Dict[str, Any]]:
     
     pdfdoc = fitz.open(pdf_path)
@@ -88,14 +92,15 @@ def extract_pdf(pdf_path: Path) -> List[Dict[str, Any]]:
 
     for i, page in enumerate(pdfdoc, start = 1):
         blocks = page.get_text("blocks")
-        
         page_blocks: List[str] = []
 
+        # Extract the textblocks and trim empties.
         for block in blocks:
             text = (block[4] or "").strip()
             if text:
                 page_blocks.append(text)
 
+        # If no text is found, return an empty page.
         if not page_blocks:
             slide_obj = build_slide_obj(
                 index = i,
@@ -105,6 +110,7 @@ def extract_pdf(pdf_path: Path) -> List[Dict[str, Any]]:
             slides.append(slide_obj)
             continue
 
+        # if first block is short, treat it as a title
         first_block = page_blocks[0]
         if len(first_block.splitlines()) <= 3:
             title = first_block
@@ -122,6 +128,7 @@ def extract_pdf(pdf_path: Path) -> List[Dict[str, Any]]:
     
     return slides
 
+# CLI arugment parser
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description = "Extract PPTX/PDF content into JSON.")
     parser.add_argument("--input", required = True, type = Path, help = "Path to input pptx/pdf")
